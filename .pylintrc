@@ -3,7 +3,7 @@ load-plugins=pylint_odoo
 score=n
 
 [ODOOLINT]
-manifest_required_authors=VentorTech
+manifest_required_authors=Olga Krikunova
 manifest_required_keys=name,version,installable,license,author
 manifest_deprecated_keys=description,active
 license_allowed=AGPL-3,GPL-2,GPL-2 or any later version,GPL-3,GPL-3 or any later version,LGPL-3,OPL-1,OEEL-1

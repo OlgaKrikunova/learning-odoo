@@ -7,8 +7,8 @@ manifest_required_authors=Olga Krikunova
 manifest_required_keys=name,version,installable,license,author
 manifest_deprecated_keys=description,active
 license_allowed=AGPL-3,GPL-2,GPL-2 or any later version,GPL-3,GPL-3 or any later version,LGPL-3,OPL-1,OEEL-1
-valid-odoo-versions=16.0
-manifest-version-format=^16\.0\.\d+\.\d+\.\d+$
+valid-odoo-versions=18.0
+manifest-version-format=^18\.0\.\d+\.\d+\.\d+$
 
 [MESSAGES CONTROL]
 disable=all

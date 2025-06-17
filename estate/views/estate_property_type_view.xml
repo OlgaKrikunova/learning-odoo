@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <list string="Channel">
                 <field name="name"/>
+                <field name="sequence"/>
             </list>
         </field>
     </record>
@@ -14,9 +15,23 @@
         <field name="name">estate_property_type.form</field>
         <field name="model">estate.property.type</field>
         <field name="arch" type="xml">
-            <form string="Estate Property">
+            <form string="Estate Property Type">
                 <sheet>
                     <h1><field name="name"/></h1>
+                    <group>
+                        <notebook>
+                            <page string="Properties">
+                                <field name="sequence" widget="handle"/>
+                                <field name="property_ids">
+                                    <list>
+                                        <field name="name"/>
+                                        <field name="expected_price"/>
+                                        <field name="state"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </group>
                 </sheet>
             </form>
         </field>

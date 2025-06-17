@@ -8,6 +8,7 @@ from odoo.tools import float_compare, float_is_zero
 class EstateProperty(models.Model):
     _name = "estate.property"
     _description = "Estate Property"
+    _order = "id desc"
 
     name = fields.Char(required=True)
     description = fields.Text()
@@ -36,7 +37,9 @@ class EstateProperty(models.Model):
         copy=False,
         required=True,
         default="new",
+        string="Status",
     )
+
     property_type_id = fields.Many2one(
         "estate.property.type",
         string="Property Type",
@@ -64,7 +67,6 @@ class EstateProperty(models.Model):
         for record in self:
             prices = record.offer_ids.mapped("price")
             record.best_price = max(prices) if prices else 0.0
-            # record.best_price = max(record.offer_ids.mapped("price"))
 
     @api.onchange("garden")
     def _onchange_garden(self):

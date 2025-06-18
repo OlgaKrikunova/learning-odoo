@@ -58,4 +58,10 @@ class EstatePropertyOffer(models.Model):
             if offer.status != "refused":
                 offer.status = "refused"
 
+    def create(self, vals):
+        offer = super().create(vals)
+        if offer.property_id.state == "new":
+            offer.property_id.state = "offer_received"
+        return offer
+
     _sql_constraints = [("check_price", "CHECK(price > 0)", "Offer price must be strictly positive.")]

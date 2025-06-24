@@ -15,8 +15,18 @@
         <field name="name">estate_property_type.form</field>
         <field name="model">estate.property.type</field>
         <field name="arch" type="xml">
+
             <form string="Estate Property Type">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(estate_property_offer_action)d"
+                                string="Offers"
+                                type="action"
+                                class="oe_stat_button"
+                                icon="fa-envelope" invisible="offer_count == 0">
+                                <field string="Offers" name="offer_count" widget="statinfo"/>
+                        </button>
+                    </div>
                     <h1><field name="name"/></h1>
                     <group>
                         <notebook>

@@ -1,6 +1,7 @@
 from datetime import timedelta
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class EstatePropertyOffer(models.Model):
@@ -11,7 +12,7 @@ class EstatePropertyOffer(models.Model):
     price = fields.Float()
     status = fields.Selection(copy=False, selection=[("accepted", "Accepted"), ("refused", "Refused")])
     partner_id = fields.Many2one("res.partner", required=True)
-    property_id = fields.Many2one("estate.property", required=True)
+    property_id = fields.Many2one("estate.property", required=True, ondelete="cascade")
     property_type_id = fields.Many2one(
         related="property_id.property_type_id", comodel_name="estate.property.type", store=True, readonly=False
     )
@@ -61,10 +62,21 @@ class EstatePropertyOffer(models.Model):
             if offer.status != "refused":
                 offer.status = "refused"
 
-    def create(self, vals):
-        offer = super().create(vals)
-        if offer.property_id.state == "new":
-            offer.property_id.state = "offer_received"
-        return offer
-
     _sql_constraints = [("check_price", "CHECK(price > 0)", "Offer price must be strictly positive.")]
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            property = self.env["estate.property"].browse(vals["property_id"])
+
+            for offer in property.offer_ids:
+                if vals["price"] < offer.price:
+                    raise UserError(_("The offer must be higher than %.2f.", offer.price))
+
+        offers = super().create(vals_list)
+
+        for offer in offers:
+            if offer.property_id.state == "new":
+                offer.property_id.state = "offer_received"
+
+        return offers

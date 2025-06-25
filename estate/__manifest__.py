@@ -11,6 +11,7 @@
         "views/estate_property_tag.xml",
         "views/estate_property_offer.xml",
         "views/estate_menus.xml",
+        "views/base.view_users_form.xml",
     ],
     "installable": True,
     "application": True,

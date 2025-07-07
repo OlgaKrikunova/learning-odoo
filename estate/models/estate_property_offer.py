@@ -23,8 +23,8 @@ class EstatePropertyOffer(models.Model):
     @api.depends("validity")
     def _compute_date_deadline(self):
         for offer in self:
-            base_date = offer.create_date.date() if offer.create_date else fields.Date.context_today(offer)
-            if offer.validity is not None:
+            base_date = offer.create_date.date() if offer.create_date else fields.Date.today()
+            if offer.validity:
                 offer.date_deadline = base_date + timedelta(days=offer.validity)
             else:
                 offer.date_deadline = False
@@ -47,7 +47,7 @@ class EstatePropertyOffer(models.Model):
         for offer in self:
             if offer.status != "accepted":
                 other_offers = offer.property_id.offer_ids - offer
-                other_offers.write({"status": "refused"})
+                other_offers.status = "refused"
                 offer.status = "accepted"
                 offer.property_id.write(
                     {

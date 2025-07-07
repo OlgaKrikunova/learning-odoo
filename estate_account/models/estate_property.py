@@ -5,6 +5,7 @@ class EstateProperty(models.Model):
     _inherit = "estate.property"
 
     def estate_property_action_sold(self):
+        result = super().estate_property_action_sold()
         for property in self:
             property_name = property.name
             commission = property.selling_price * 0.06 if property.selling_price else 0.0
@@ -33,4 +34,4 @@ class EstateProperty(models.Model):
 
             self.env["account.move"].create(move_vals)
 
-        return super().estate_property_action_sold()
+        return result

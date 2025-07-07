@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import float_compare, float_is_zero
+from odoo.tools import float_compare
 
 
 class EstateProperty(models.Model):
@@ -55,12 +55,12 @@ class EstateProperty(models.Model):
 
     total_area = fields.Float(compute="_compute_total_area")
 
+    best_price = fields.Float(compute="_compute_best_price")
+
     @api.depends("living_area", "garden_area")
     def _compute_total_area(self):
         for record in self:
             record.total_area = record.living_area + record.garden_area
-
-    best_price = fields.Float(compute="_compute_best_price")
 
     @api.depends("offer_ids")
     def _compute_best_price(self):
@@ -73,7 +73,6 @@ class EstateProperty(models.Model):
         if self.garden:
             self.garden_area = 10
             self.garden_orientation = "north"
-
         else:
             self.garden_area = 0
             self.garden_orientation = ""
@@ -99,12 +98,6 @@ class EstateProperty(models.Model):
     def _check_selling_price(self):
         precision = 2
         for record in self:
-            if float_is_zero(record.selling_price, precision_digits=precision):
-                continue
-
-            if float_is_zero(record.expected_price, precision_digits=precision):
-                continue
-
             accepted_offer = record.offer_ids.filtered(lambda o: o.status == "accepted")
             if not accepted_offer:
                 continue

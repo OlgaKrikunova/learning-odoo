@@ -29,6 +29,13 @@ class EstateProperty(models.Model):
                             "price_unit": admin_fee,
                         }
                     ),
+                    Command.create(
+                        {
+                            "name": f" {property_name} (sale price)",
+                            "quantity": 1,
+                            "price_unit": property.selling_price,
+                        }
+                    ),
                 ],
             }
 

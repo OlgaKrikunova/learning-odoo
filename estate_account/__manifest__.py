@@ -6,4 +6,7 @@
     "depends": ["estate", "account"],
     "installable": True,
     "application": False,
+    "data": [
+        "views/account_move_view.xml",
+    ],
 }

@@ -8,6 +8,10 @@
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="internal_note"/>
             </xpath>
+             <xpath expr="//button[@name='action_quotation_send']" position="after">
+                 <button name="send_internal_email" type="object" string="Send Internal Email" class="btn-secondary"/>
+            </xpath>
         </field>
     </record>
+
 </odoo>

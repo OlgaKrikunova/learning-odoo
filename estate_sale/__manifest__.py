@@ -6,6 +6,7 @@
     "depends": ["estate", "sale"],
     "data": [
         "views/sale_order_view.xml",
+        "data/mail_template_sale.xml",
     ],
     "installable": True,
     "application": False,

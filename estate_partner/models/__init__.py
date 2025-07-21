@@ -1,1 +1,1 @@
-from . import estate_partner
+from . import partner

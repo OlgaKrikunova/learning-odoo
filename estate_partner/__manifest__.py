@@ -5,7 +5,7 @@
     "license": "LGPL-3",
     "depends": ["estate", "partner_autocomplete"],
     "data": [
-        "views/estate_partner_views.xml",
+        "views/res_partner_views.xml",
     ],
     "installable": True,
     "application": True,

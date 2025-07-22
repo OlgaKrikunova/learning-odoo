@@ -8,10 +8,23 @@
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="internal_note"/>
             </xpath>
-             <xpath expr="//button[@name='action_quotation_send']" position="after">
-                 <button name="send_internal_email" type="object" string="Send Internal Email" class="btn-secondary"/>
+            <xpath expr="//button[@name='action_quotation_send']" position="after">
+                <button name="send_internal_email" type="object" string="Send Internal Email" class="btn-secondary"/>
             </xpath>
         </field>
     </record>
+
+
+    <record id="sale_order_tree_inherit" model="ir.ui.view">
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_status']" position="after">
+                    <field name="create_date"/>
+            </xpath>
+
+        </field>
+    </record>
+
 
 </odoo>

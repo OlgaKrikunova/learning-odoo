@@ -11,6 +11,9 @@
             <xpath expr="//button[@name='action_quotation_send']" position="after">
                 <button name="send_internal_email" type="object" string="Send Internal Email" class="btn-secondary"/>
             </xpath>
+             <xpath expr="//field[@name='payment_term_id']" position="attributes">
+                   <attribute name="required">1</attribute>
+            </xpath>
         </field>
     </record>
 
@@ -22,7 +25,6 @@
             <xpath expr="//field[@name='invoice_status']" position="after">
                     <field name="create_date"/>
             </xpath>
-
         </field>
     </record>
 

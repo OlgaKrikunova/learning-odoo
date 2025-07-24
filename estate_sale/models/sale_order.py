@@ -5,6 +5,7 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     internal_note = fields.Text()
+    team_id = fields.Many2one(default="")
 
     def send_internal_email(self):
         template = self.env.ref("estate_sale.mail_template_sale_internal_email")

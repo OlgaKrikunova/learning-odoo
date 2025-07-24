@@ -6,6 +6,8 @@ class ProductTemplate(models.Model):
 
     is_stock_low = fields.Boolean(compute="_compute_is_stock_low")
 
+    product_category = fields.Selection([("standard", "Standard"), ("premium", "Premium"), ("eco", "Eco")])
+
     @api.depends()
     def _compute_is_stock_low(self):
         for record in self:

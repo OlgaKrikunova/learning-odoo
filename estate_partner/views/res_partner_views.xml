@@ -18,7 +18,9 @@
                 <group>
                     <field name="is_vip" widget="boolean_toggle"/>
                 </group>
-
+            </xpath>
+            <xpath expr="//group/field[@name='company_registry']" position="before">
+                    <field name="client_origin"/>
             </xpath>
         </field>
     </record>

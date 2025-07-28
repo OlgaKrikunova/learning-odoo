@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class SaleOrder(models.Model):
@@ -18,3 +18,10 @@ class SaleOrder(models.Model):
             email_layout_xmlid="mail.mail_notification_light",
         )
         return True
+
+    is_big_order = fields.Boolean(compute="_compute_big_order", store=True)
+
+    @api.depends("amount_total")
+    def _compute_big_order(self):
+        for record in self:
+            record.is_big_order = record.amount_total > 1000

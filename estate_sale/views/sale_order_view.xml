@@ -14,6 +14,11 @@
              <xpath expr="//field[@name='payment_term_id']" position="attributes">
                    <attribute name="required">1</attribute>
             </xpath>
+            <xpath expr="//field[@name='order_line']" position="after">
+                <group>
+                   <field name="line_count" decoration-bf="2"/>
+                </group>
+            </xpath>
         </field>
     </record>
 

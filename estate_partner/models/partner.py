@@ -7,3 +7,8 @@ class ResPartner(models.Model):
     manager_comment = fields.Text(string="Manager's Comment")
 
     is_vip = fields.Boolean(string="VIP client")
+
+    client_origin = fields.Selection(
+        [("web", "Website"), ("referral", "On recommendation"), ("event", "From the event"), ("other", "Other")],
+        string="Customer Origin",
+    )

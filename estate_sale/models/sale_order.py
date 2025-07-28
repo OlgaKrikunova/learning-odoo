@@ -26,3 +26,9 @@ class SaleOrder(models.Model):
     def _compute_big_order(self):
         for record in self:
             record.is_big_order = record.amount_total > 1000
+
+    line_count = fields.Integer(string="Number of positions", compute="_compute_line_count")
+
+    def _compute_line_count(self):
+        for rec in self:
+            rec.line_count = len(rec.order_line)

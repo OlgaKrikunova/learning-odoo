@@ -36,6 +36,9 @@
                     VIP
                 </div>
             </xpath>
+            <xpath expr="//field[@name='category_id']" position="attributes">
+                <attribute name="invisible">not mobile</attribute>
+            </xpath>
         </field>
     </record>
 

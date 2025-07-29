@@ -26,3 +26,38 @@ class SaleOrder(models.Model):
     def _compute_big_order(self):
         for record in self:
             record.is_big_order = record.amount_total > 1000
+
+    def action_duplicate_lines_to_new_order(self):
+        for order in self:
+            # create a new order
+            new_order = self.env["sale.order"].create(
+                {
+                    "partner_id": order.partner_id.id,
+                    "user_id": order.user_id.id,
+                    "origin": f"Copied from {order.name}",
+                }
+            )
+
+            # create order lines (without discounts)
+            for line in order.order_line:
+                self.env["sale.order.line"].create(
+                    {
+                        "order_id": new_order.id,
+                        "product_id": line.product_id.id,
+                        "product_uom_qty": line.product_uom_qty,
+                        "product_uom": line.product_uom.id,
+                        "price_unit": line.price_unit,
+                        "discount": 0.0,
+                        "name": line.name,
+                    }
+                )
+
+            # return action to open a new order
+            return {
+                "type": "ir.actions.act_window",
+                "name": "New Sale Order",
+                "res_model": "sale.order",
+                "view_mode": "form",
+                "res_id": new_order.id,
+                "target": "current",
+            }

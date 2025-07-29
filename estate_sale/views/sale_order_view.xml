@@ -14,6 +14,10 @@
              <xpath expr="//field[@name='payment_term_id']" position="attributes">
                    <attribute name="required">1</attribute>
             </xpath>
+            <xpath expr="//button[@name='send_internal_email']" position="before">
+                <button name="action_duplicate_lines_to_new_order" type="object"
+                        string="Duplicate" class="btn-secondary"/>
+            </xpath>
         </field>
     </record>
 

@@ -8,13 +8,23 @@
             <field name="invoice_outstanding_credits_debits_widget" position="after">
                 <group colspan="4">
                     <group class="oe_subtotal_footer">
-                        <field name="total_with_tax" style="font-weight: bold; font-size: 20px;"/>
+                        <field name="total_with_tax" style="font-weight: bold; font-size: 20px;" invisible="amount_tax==0"/>
                     </group>
-
                 </group>
-
             </field>
 
+        </field>
+    </record>
+
+    <record id="view_invoice_tree_inherit" model="ir.ui.view">
+        <field name="name">account.invoice.list</field>
+        <field name="inherit_id" ref="account.view_out_invoice_tree"/>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_send_and_print']" position="after">
+                <button name="delete_draft_invoices" type="object"
+                        string="Delete Draft Invoices" class="btn-secondary" confirm="Are you sure?"/>
+            </xpath>
         </field>
     </record>
 

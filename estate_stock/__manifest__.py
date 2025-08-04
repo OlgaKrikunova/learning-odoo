@@ -8,5 +8,6 @@
     "application": False,
     "data": [
         "view/product_template_view.xml",
+        "view/warehouse_view.xml",
     ],
 }

@@ -1,4 +1,5 @@
-from odoo import fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class ResPartner(models.Model):
@@ -12,3 +13,9 @@ class ResPartner(models.Model):
         [("web", "Website"), ("referral", "On recommendation"), ("event", "From the event"), ("other", "Other")],
         string="Customer Origin",
     )
+
+    @api.ondelete(at_uninstall=False)
+    def _check_partner_orders(self):
+        for partner in self:
+            if partner.sale_order_ids:
+                raise UserError(_("It is not possible to delete a client with orders."))

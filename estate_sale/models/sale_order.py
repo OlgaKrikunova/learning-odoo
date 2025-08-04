@@ -39,8 +39,9 @@ class SaleOrder(models.Model):
             )
 
             # create order lines (without discounts)
+            line_vals = []
             for line in order.order_line:
-                self.env["sale.order.line"].create(
+                line_vals.append(
                     {
                         "order_id": new_order.id,
                         "product_id": line.product_id.id,
@@ -51,6 +52,7 @@ class SaleOrder(models.Model):
                         "name": line.name,
                     }
                 )
+            self.env["sale.order.line"].create(line_vals)
 
             # return action to open a new order
             return {

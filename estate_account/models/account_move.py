@@ -10,3 +10,8 @@ class AccountMove(models.Model):
     def _compute_total_with_tax(self):
         for record in self:
             record.total_with_tax = record.amount_untaxed + record.amount_tax
+
+    def delete_draft_invoices(self):
+        draft_to_delete = self.filtered(lambda x: x.state == "draft")
+
+        draft_to_delete.unlink()

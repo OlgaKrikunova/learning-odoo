@@ -27,6 +27,43 @@ class SaleOrder(models.Model):
         for record in self:
             record.is_big_order = record.amount_total > 1000
 
+    def action_duplicate_lines_to_new_order(self):
+        for order in self:
+            # create a new order
+            new_order = self.env["sale.order"].create(
+                {
+                    "partner_id": order.partner_id.id,
+                    "user_id": order.user_id.id,
+                    "origin": f"Copied from {order.name}",
+                }
+            )
+
+            # create order lines (without discounts)
+            line_vals = []
+            for line in order.order_line:
+                line_vals.append(
+                    {
+                        "order_id": new_order.id,
+                        "product_id": line.product_id.id,
+                        "product_uom_qty": line.product_uom_qty,
+                        "product_uom": line.product_uom.id,
+                        "price_unit": line.price_unit,
+                        "discount": 0.0,
+                        "name": line.name,
+                    }
+                )
+            self.env["sale.order.line"].create(line_vals)
+
+            # return action to open a new order
+            return {
+                "type": "ir.actions.act_window",
+                "name": "New Sale Order",
+                "res_model": "sale.order",
+                "view_mode": "form",
+                "res_id": new_order.id,
+                "target": "current",
+            }
+
     line_count = fields.Integer(string="Number of positions", compute="_compute_line_count")
 
     def _compute_line_count(self):

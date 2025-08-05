@@ -9,7 +9,6 @@
         <field name="postcode">12345</field>
         <field name="date_availability">2020-02-02</field>
         <field name="expected_price">1600000</field>
-<!--        <field name="selling_price">0</field>-->
         <field name="bedrooms">6</field>
         <field name="living_area">100</field>
         <field name="facades">4</field>
@@ -32,8 +31,37 @@
         <field name="living_area">10</field>
         <field name="facades">4</field>
         <field name="garage">False</field>
-<!--        <field name="garden"></field>-->
-<!--        <field name="garden_area"></field>-->
-<!--        <field name="garden_orientation"></field>-->
     </record>
+
+
+     <record id="property_type_demo_apartment" model="estate.property">
+        <field name="name">Apartment</field>
+        <field name="property_type_id" ref="estate.property_type_residential"/>
+        <field name="state">cancelled</field>
+        <field name="description">Comfortable apartment in a multi-storey building</field>
+        <field name="postcode">78965</field>
+        <field name="date_availability">2021-01-01</field>
+        <field name="expected_price">1500000</field>
+        <field name="selling_price">1500000</field>
+        <field name="bedrooms">4</field>
+        <field name="living_area">150</field>
+        <field name="facades">2</field>
+        <field name="garage">False</field>
+          <field
+                name="offer_ids"
+                eval="[
+                    Command.create({
+                        'price': 1500000,
+                        'validity': 10,
+                        'partner_id': ref('base.res_partner_12')
+                    }),
+                    Command.create({
+                        'price': 1490000,
+                        'validity': 14,
+                        'partner_id': ref('base.res_partner_2')
+                    })
+                ]"
+            />
+    </record>
+
 </odoo>

@@ -39,6 +39,7 @@ class EstateProperty(models.Model):
                 ],
             }
 
-            self.env["account.move"].create(move_vals)
+            self.check_access("write")
+            self.env["account.move"].sudo().create(move_vals)
 
         return result

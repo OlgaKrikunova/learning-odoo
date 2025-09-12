@@ -8,5 +8,6 @@
     "application": False,
     "data": [
         "views/account_move_view.xml",
+        "report/estate_account_template.xml",
     ],
 }

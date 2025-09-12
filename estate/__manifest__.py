@@ -15,6 +15,8 @@
         "views/estate_menus.xml",
         "views/base.view_users_form.xml",
         "data/property_type_data.xml",
+        "report/property_offer_template.xml",
+        "report/property_offer_reports.xml",
     ],
     "demo": [
         "demo/property_type_demo.xml",

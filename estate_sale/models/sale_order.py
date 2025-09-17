@@ -6,6 +6,13 @@ class SaleOrder(models.Model):
 
     internal_note = fields.Text()
     team_id = fields.Many2one(default=False)
+    shipping_method = fields.Selection(
+        selection=[("self_pickup", "Self pickup"), ("pickup_later", "Pickup later"), ("delivery", "Delivery")],
+        required=True,
+        copy=True,
+        tracking=False,
+        help="Select how the order will be fulfilled.",
+    )
 
     def send_internal_email(self):
         template = self.env.ref("estate_sale.mail_template_sale_internal_email")
@@ -69,3 +76,8 @@ class SaleOrder(models.Model):
     def _compute_line_count(self):
         for rec in self:
             rec.line_count = len(rec.order_line)
+
+    def _prepare_invoice(self):
+        vals = super()._prepare_invoice()
+        vals["shipping_method"] = self.shipping_method
+        return vals

@@ -81,3 +81,13 @@ class SaleOrder(models.Model):
         vals = super()._prepare_invoice()
         vals["shipping_method"] = self.shipping_method
         return vals
+
+    def action_confirm(self):
+        res = super().action_confirm()
+        self.picking_ids.shipping_method = self.shipping_method
+
+        if self.shipping_method == "self_pickup":
+            result = self.picking_ids.button_validate()
+            return result
+
+        return res

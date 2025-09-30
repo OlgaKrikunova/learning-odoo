@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
@@ -59,6 +59,25 @@ class EstateProperty(models.Model):
 
     company_id = fields.Many2one("res.company", string="Company", required=True, default=lambda self: self.env.company)
 
+    construction_year = fields.Integer(default=datetime.now().year)
+
+    age = fields.Char(compute="_compute_age")
+
+    discount_applied = fields.Boolean(default=False)
+
+    cancel_discount = fields.Boolean(default=False)
+
+    original_price = fields.Float()
+
+    average_offer_price = fields.Float(compute="_compute_average_offer_price", store=True)
+
+    accept_highest_offer = fields.Boolean(default=False)
+    cancel_highest_offer = fields.Boolean(default=False)
+
+    sold_date = fields.Date(copy=False)
+
+    is_favourite = fields.Boolean(string="Mark as Favorite", default=False)
+
     @api.depends("living_area", "garden_area")
     def _compute_total_area(self):
         for record in self:
@@ -114,3 +133,79 @@ class EstateProperty(models.Model):
         for record in self:
             if record.state not in ("new", "cancelled"):
                 raise UserError(_("Only New and Cancelled properties can be deleted."))
+
+    def _compute_age(self):
+        current_year = datetime.now().year
+        for record in self:
+            if record.construction_year:
+                record.age = current_year - record.construction_year
+            else:
+                record.age = 0
+
+    def action_apply_discount(self):
+        for record in self:
+            if record.discount_applied:
+                raise UserError(_("Discount was already applied!"))
+
+            record.original_price = record.expected_price
+
+            new_price = record.expected_price * 0.9
+            if new_price < 1000:
+                raise ValidationError(_("Price must be at least 1000!"))
+
+            record.expected_price = new_price
+            record.discount_applied = True
+
+    def cancel_apply_discount(self):
+        for record in self:
+            if not record.discount_applied:
+                raise UserError(_("Discount was not applied!"))
+
+            record.expected_price = record.original_price
+            record.discount_applied = False
+
+    @api.depends("offer_ids.price")
+    def _compute_average_offer_price(self):
+        for record in self:
+            offers = record.offer_ids
+            if offers:
+                total_sum = sum(offers.mapped("price"))
+                count = len(offers)
+                record.average_offer_price = total_sum / count
+
+            else:
+                record.average_offer_price = 0
+
+    def action_accept_highest_offer(self):
+        for record in self:
+            record.accept_highest_offer = True
+            if record.state == "sold":
+                raise UserError(_("Property is already sold!"))
+
+            offers = record.offer_ids
+            if not offers:
+                raise UserError(_("There are no offers to accept!"))
+
+            best_offer = max(offers, key=lambda offer: offer.price)
+            record.buyer_id = best_offer.partner_id
+            best_offer.status = "accepted"
+            (offers - best_offer).write({"status": "refused"})
+
+            record.state = "sold"
+            record.sold_date = fields.Date.today()
+
+    def cancel_accept_highest_offer(self):
+        for record in self:
+            record.accept_highest_offer = False
+            if record.state != "sold":
+                raise UserError(_("Property is not sold!"))
+
+            record.state = "new"
+            record.sold_date = False
+            record.buyer_id = False
+
+    def action_is_favourite(self):
+        for record in self:
+            record.is_favourite = not record.is_favourite
+
+        return True

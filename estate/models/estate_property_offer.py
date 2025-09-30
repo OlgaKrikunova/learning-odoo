@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class EstatePropertyOffer(models.Model):
@@ -35,6 +35,12 @@ class EstatePropertyOffer(models.Model):
             if offer.date_deadline:
                 delta = offer.date_deadline - base_date
                 offer.validity = delta.days
+
+    @api.constrains("validity")
+    def _check_validity_within_60_days(self):
+        for offer in self:
+            if offer.validity > 60:
+                raise ValidationError(_("Deadline cannot be more than 60 days from the creation date."))
 
     @api.model
     def default_get(self, fields_names):

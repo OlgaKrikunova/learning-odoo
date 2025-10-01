@@ -12,6 +12,7 @@
         "views/estate_property_offer.xml",
         "views/estate_property_type_view.xml",
         "views/estate_property_tag.xml",
+        "wizard/estate_property_mass_update_wizard_view.xml",
         "views/estate_menus.xml",
         "views/base.view_users_form.xml",
         "data/property_type_data.xml",

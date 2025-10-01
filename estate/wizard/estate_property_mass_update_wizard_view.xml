@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_estate_property_mass_update_wizard" model="ir.ui.view">
+        <field name="name">estate.property.mass.update.wizard.form</field>
+        <field name="model">estate.property.mass.update.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Mass Update Property Status">
+                <group>
+                    <field name="state"/>
+                    <field name="property_ids"  options="{'no_create': True}" nolabel="1">
+                        <list>
+                            <field name="name"/>
+                            <field name="state"/>
+                            <field name="expected_price"/>
+                        </list>
+                    </field>
+                </group>
+                <footer>
+                    <button string="Apply" type="object" name="action_apply" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="action_estate_property_mass_update_wizard" model="ir.actions.act_window">
+        <field name="name">Mass Update Status</field>
+        <field name="res_model">estate.property.mass.update.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_estate_property"/>
+
+    </record>
+
+</odoo>

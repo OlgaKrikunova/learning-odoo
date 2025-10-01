@@ -12,6 +12,7 @@ class SaleOrder(models.Model):
         copy=True,
         tracking=False,
         help="Select how the order will be fulfilled.",
+        default="delivery",
     )
 
     def send_internal_email(self):

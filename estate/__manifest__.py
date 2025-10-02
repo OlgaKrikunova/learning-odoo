@@ -16,6 +16,7 @@
         "views/estate_menus.xml",
         "views/base.view_users_form.xml",
         "data/property_type_data.xml",
+        "data/estate_property_offer_cron.xml",
         "report/property_offer_template.xml",
         "report/property_offer_reports.xml",
     ],

@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
@@ -10,7 +10,9 @@ class EstatePropertyOffer(models.Model):
     _order = "price desc"
 
     price = fields.Float()
-    status = fields.Selection(copy=False, selection=[("accepted", "Accepted"), ("refused", "Refused")])
+    status = fields.Selection(
+        copy=False, selection=[("accepted", "Accepted"), ("refused", "Refused"), ("expired", "Expired")]
+    )
     partner_id = fields.Many2one("res.partner", required=True)
     property_id = fields.Many2one("estate.property", required=True, ondelete="cascade")
     property_type_id = fields.Many2one(
@@ -19,6 +21,8 @@ class EstatePropertyOffer(models.Model):
 
     validity = fields.Integer(default=7)
     date_deadline = fields.Date(compute="_compute_date_deadline", inverse="_inverse_date_deadline", store=True)
+
+    date_create = fields.Date(default=fields.Date.today())
 
     @api.depends("validity")
     def _compute_date_deadline(self):
@@ -86,3 +90,27 @@ class EstatePropertyOffer(models.Model):
                 offer.property_id.state = "offer_received"
 
         return offers
+
+    @api.constrains("property_id", "partner_id", "status")
+    def _check_unique_offer(self):
+        for offer in self:
+            check = self.search(
+                [
+                    ("property_id", "=", offer.property_id.id),
+                    ("partner_id", "=", offer.partner_id.id),
+                    ("status", "!=", "refused"),
+                    ("id", "!=", offer.id),
+                ]
+            )
+
+            if check:
+                raise ValidationError(_("This buyer has already made an offer on this property."))
+
+    @api.model
+    def check_expired_offers(self):
+        check = datetime.now() - timedelta(days=30)
+        old_offers = self.search(
+            [("status", "not in", ["accepted", "refused", "expired"]), ("create_date", "<", check)]
+        )
+        old_offers.write({"status": "expired"})
+        return True

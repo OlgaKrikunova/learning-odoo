@@ -6,6 +6,7 @@
     "category": "Real Estate/Brokerage",
     "depends": ["base"],
     "data": [
+        "data/estate_sequence.xml",
         "security/estate_security.xml",
         "security/ir.model.access.csv",
         "views/estate_property_views.xml",

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="seq_estate_unique_number" model="ir.sequence">
+        <field name="name">Unique Number</field>
+        <field name="code">estate.property</field>
+        <field name="prefix">PROP</field>
+        <field name="padding">4</field>
+        <field name="implementation">standard</field>
+    </record>
+
+</odoo>

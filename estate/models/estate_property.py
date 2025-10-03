@@ -78,6 +78,10 @@ class EstateProperty(models.Model):
 
     is_favourite = fields.Boolean(string="Mark as Favorite", default=False)
 
+    offer_count = fields.Integer(compute="_compute_offer_count", store=True)
+
+    unique_number = fields.Char(readonly=True)
+
     @api.depends("living_area", "garden_area")
     def _compute_total_area(self):
         for record in self:
@@ -209,3 +213,16 @@ class EstateProperty(models.Model):
             record.is_favourite = not record.is_favourite
 
         return True
+
+    @api.depends("offer_ids")
+    def _compute_offer_count(self):
+        for record in self:
+            record.offer_count = len(record.offer_ids)
+
+    @api.model_create_multi
+    def create(self, values):
+        for vals in values:
+            if not vals.get("unique_number"):
+                vals["unique_number"] = self.env["ir.sequence"].next_by_code("estate.property")
+
+        return super().create(values)

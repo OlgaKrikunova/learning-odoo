@@ -27,6 +27,8 @@
                 <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                 <field name="total_area"/>
                 <field name="best_price"/>
+                <field name="offer_count"/>
+                <field name="unique_number"/>
             </list>
         </field>
     </record>
@@ -63,6 +65,7 @@
                     <h1><field name="name"/></h1>
                     <group>
                         <group>
+                            <field name="unique_number" readonly="1"/>
                             <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                             <field name="property_type_id" options='{"format": false}' decoration-success="offer_ids"/>
                             <field name="postcode"/>
@@ -105,6 +108,10 @@
                             </group>
                         </page>
                         <page string="Offers">
+                            <div>
+                                <span>Offers count: </span>
+                                <field name="offer_count" widget="badge"/>
+                            </div>
                             <field name="offer_ids" readonly="state in ('offer_accepted', 'sold', 'cancelled')"/>
                         </page>
                     </notebook>
@@ -168,7 +175,8 @@
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click">
                             <div>
-                                <strong><field name="name"/></strong>
+                                <strong><field name="name"/> <field name="unique_number" widget="badge"/>
+                                </strong>
                                 <br/>
                                 <t t-if="record.state.raw_value == 'sold'">
                                     <span style="background-color: green; color: white; padding: 2px 4px; border-radius: 4px;">

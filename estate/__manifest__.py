@@ -4,7 +4,7 @@
     "version": "18.0.1.0.0",
     "license": "LGPL-3",
     "category": "Real Estate/Brokerage",
-    "depends": ["base"],
+    "depends": ["base", "mail"],
     "data": [
         "data/estate_sequence.xml",
         "security/estate_security.xml",

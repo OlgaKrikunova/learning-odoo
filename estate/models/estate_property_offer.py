@@ -1,17 +1,23 @@
+import logging
 from datetime import datetime, timedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+
+_logger = logging.getLogger(__name__)
 
 
 class EstatePropertyOffer(models.Model):
     _name = "estate.property.offer"
     _description = "Property Offer"
     _order = "price desc"
+    _inherit = ["mail.thread", "mail.activity.mixin"]
 
     price = fields.Float()
     status = fields.Selection(
-        copy=False, selection=[("accepted", "Accepted"), ("refused", "Refused"), ("expired", "Expired")]
+        copy=False,
+        selection=[("draft", "Draft"), ("accepted", "Accepted"), ("refused", "Refused"), ("expired", "Expired")],
+        default="draft",
     )
     partner_id = fields.Many2one("res.partner", required=True)
     property_id = fields.Many2one("estate.property", required=True, ondelete="cascade")
@@ -23,6 +29,8 @@ class EstatePropertyOffer(models.Model):
     date_deadline = fields.Date(compute="_compute_date_deadline", inverse="_inverse_date_deadline", store=True)
 
     date_create = fields.Date(default=fields.Date.today())
+
+    has_activity = fields.Boolean(compute="_compute_has_activity")
 
     @api.depends("validity")
     def _compute_date_deadline(self):
@@ -114,3 +122,49 @@ class EstatePropertyOffer(models.Model):
         )
         old_offers.write({"status": "expired"})
         return True
+
+    @api.model
+    def check_old_offers_more_seven_days(self):
+        check = datetime.now() - timedelta(days=7)
+        old_offers = self.search([("status", "=", "draft"), ("create_date", "<", check)])
+
+        activity_type = self.env.ref("mail.mail_activity_data_todo", raise_if_not_found=False)
+        if not activity_type:
+            _logger.warning("Activity type 'todo' not found! Skipping creation of activities.")
+
+        for offer in old_offers:
+            user = offer.property_id.salesman_id
+            if not user:
+                _logger.info(f"Offer {offer.id} skipped: no assigned salesman.")
+                continue
+            if not activity_type:
+                _logger.info(f"Offer {offer.id} skipped: activity type not found.")
+                continue
+
+            offer.activity_schedule(
+                activity_type_id=activity_type.id,
+                user_id=user.id,
+                date_deadline=fields.Date.today(),
+                note=(_("Follow up this offer for property %s"), offer.property_id.name),
+                summary=_("Follow up offers! %s"),
+            )
+            _logger.info(f"Activity created for offer {offer.id} assigned to user {user.name}.")
+
+    def _compute_has_activity(self):
+        for offer in self:
+            offer.has_activity = bool(
+                self.env["mail.activity"].search_count(
+                    [("res_model", "=", "estate.property.offer"), ("res_id", "=", offer.id)]
+                )
+            )
+
+    def action_view_activities(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Activities",
+            "res_model": "mail.activity",
+            "view_mode": "list,form",
+            "target": "current",
+            "domain": [("res_model", "=", "estate.property.offer"), ("res_id", "=", self.id)],
+        }

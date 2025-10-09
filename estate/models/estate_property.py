@@ -2,13 +2,14 @@ from datetime import datetime, timedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import float_compare
+from odoo.tools import float_compare, html_escape
 
 
 class EstateProperty(models.Model):
     _name = "estate.property"
     _description = "Estate Property"
     _order = "id desc"
+    _inherit = ["mail.thread", "mail.activity.mixin"]
 
     name = fields.Char(required=True)
     description = fields.Text()
@@ -107,6 +108,23 @@ class EstateProperty(models.Model):
             if record.state == "cancelled":
                 raise UserError(_("Cancelled property cannot be marked as sold."))
             record.state = "sold"
+
+            record.message_post(
+                body=_("The property %s has been successfully sold!", html_escape(record.name)),
+                subtype_xmlid="mail.mt_note",
+            )
+
+            user = record.salesman_id or self.env.user
+            record.activity_schedule(
+                "mail.mail_activity_data_todo",
+                user_id=user.id,
+                summary=_("Property sold!"),
+                note=_(
+                    "The property %(name)s has been marked as sold by %(user)s",
+                    name=html_escape(record.name),
+                    user=html_escape(self.env.user.name),
+                ),
+            )
 
     def estate_property_action_cancel(self):
         for record in self:

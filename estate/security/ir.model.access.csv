@@ -17,3 +17,5 @@ estate.access_estate_property_offer_user,access_estate_property_offer_user,estat
 ,,,,,,,
 estate.access_estate_property_mass_update_wizard,access_estate_property_mass_update_wizard,estate.model_estate_property_mass_update_wizard,estate.estate_group_user,1,1,1,
 ,,,,,,,
+estate.access_estate_sold_report,access_estate_sold_report,estate.model_estate_sold_report,estate.estate_group_manager,1,1,1,
+estate.access_estate_sold_report_line,access_estate_sold_report_line,estate.model_estate_sold_report_line,estate.estate_group_manager,1,1,1,

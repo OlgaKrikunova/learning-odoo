@@ -173,7 +173,7 @@
             <kanban default_group_by="property_type_id">
                 <field name="state"/>
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div class="oe_kanban_global_click">
                             <div>
                                 <strong><field name="name"/> <field name="unique_number" widget="badge"/>

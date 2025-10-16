@@ -244,3 +244,19 @@ class EstateProperty(models.Model):
                 vals["unique_number"] = self.env["ir.sequence"].next_by_code("estate.property")
 
         return super().create(values)
+
+    @api.model_create_multi
+    def create_offer(self, vals_list):
+        records = super().create(vals_list)
+
+        for record in records:
+            offer_vals = {
+                "property_id": record.id,
+                "price": record.expected_price,
+                "status": "draft",
+                "partner_id": self.env.user.partner_id.id,
+            }
+
+            self.env["estate.property.offer"].create(offer_vals)
+
+        return records

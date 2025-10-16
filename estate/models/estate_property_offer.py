@@ -145,7 +145,7 @@ class EstatePropertyOffer(models.Model):
                 activity_type_id=activity_type.id,
                 user_id=user.id,
                 date_deadline=fields.Date.today(),
-                note=(_("Follow up this offer for property %s"), offer.property_id.name),
+                note=_("Follow up this offer for property %(name)s", name=offer.property_id.name),
                 summary=_("Follow up offers! %s"),
             )
             _logger.info(f"Activity created for offer {offer.id} assigned to user {user.name}.")

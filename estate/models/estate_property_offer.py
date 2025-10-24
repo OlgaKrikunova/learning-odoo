@@ -16,7 +16,13 @@ class EstatePropertyOffer(models.Model):
     price = fields.Float()
     status = fields.Selection(
         copy=False,
-        selection=[("draft", "Draft"), ("accepted", "Accepted"), ("refused", "Refused"), ("expired", "Expired")],
+        selection=[
+            ("draft", "Draft"),
+            ("received", "Received"),
+            ("accepted", "Accepted"),
+            ("refused", "Refused"),
+            ("expired", "Expired"),
+        ],
         default="draft",
     )
     partner_id = fields.Many2one("res.partner", required=True)
@@ -87,14 +93,14 @@ class EstatePropertyOffer(models.Model):
         for vals in vals_list:
             property = self.env["estate.property"].browse(vals["property_id"])
 
-            for offer in property.offer_ids:
+            for offer in property.offer_ids.filtered(lambda x: x.status not in ["draft", "refused"]):
                 if vals["price"] < offer.price:
                     raise UserError(_("The offer must be higher than %.2f.", offer.price))
 
         offers = super().create(vals_list)
 
         for offer in offers:
-            if offer.property_id.state == "new":
+            if offer.property_id.state == "new" and offer.status == "received":
                 offer.property_id.state = "offer_received"
 
         return offers

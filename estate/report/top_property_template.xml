@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+    <template id="report_property_top">
+
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 style="margin-top: 50px;">Top 10 Properties by Price</h2>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Property Name</th>
+                                    <th>Salesman</th>
+                                    <th>Expected Price</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="enumerate(docs, 1)" t-as="item">
+                                    <tr>
+                                        <td><t t-esc="item[0]"/></td>
+                                        <td><span t-field="item[1].name"/></td>
+                                        <td><span t-field="item[1].salesman_id.name"/></td>
+                                        <td><span t-field="item[1].expected_price"/></td>
+                                        <td><span t-field="item[1].state"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+
+    </template>
+</odoo>

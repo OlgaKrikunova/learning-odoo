@@ -15,8 +15,8 @@ class EstateProperty(models.Model):
     description = fields.Text()
     postcode = fields.Char()
     date_availability = fields.Date(copy=False, default=fields.Date.today() + timedelta(days=90))
-    expected_price = fields.Float(required=True)
-    selling_price = fields.Float(readonly=True, copy=False)
+    expected_price = fields.Float(required=True, tracking=True)
+    selling_price = fields.Float(readonly=True, copy=False, tracking=True)
     bedrooms = fields.Integer(default=2)
     living_area = fields.Integer()
     facades = fields.Integer()
@@ -39,6 +39,7 @@ class EstateProperty(models.Model):
         required=True,
         default="new",
         string="Status",
+        tracking=True,
     )
 
     property_type_id = fields.Many2one(
@@ -46,7 +47,7 @@ class EstateProperty(models.Model):
         string="Property Type",
     )
 
-    salesman_id = fields.Many2one("res.users", string="Salesman", default=lambda self: self.env.user)
+    salesman_id = fields.Many2one("res.users", string="Salesman", default=lambda self: self.env.user, tracking=True)
 
     buyer_id = fields.Many2one("res.partner", string="Buyer", copy=False)
 
@@ -56,7 +57,7 @@ class EstateProperty(models.Model):
 
     total_area = fields.Float(compute="_compute_total_area")
 
-    best_price = fields.Float(compute="_compute_best_price")
+    best_price = fields.Float(compute="_compute_best_price", tracking=True)
 
     company_id = fields.Many2one("res.company", string="Company", required=True, default=lambda self: self.env.company)
 
@@ -238,15 +239,11 @@ class EstateProperty(models.Model):
             record.offer_count = len(record.offer_ids)
 
     @api.model_create_multi
-    def create(self, values):
-        for vals in values:
+    def create(self, vals_list):
+        for vals in vals_list:
             if not vals.get("unique_number"):
                 vals["unique_number"] = self.env["ir.sequence"].next_by_code("estate.property")
 
-        return super().create(values)
-
-    @api.model_create_multi
-    def create_offer(self, vals_list):
         records = super().create(vals_list)
 
         for record in records:

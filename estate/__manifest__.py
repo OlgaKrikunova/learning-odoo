@@ -21,6 +21,8 @@
         "data/estate_property_offer_cron.xml",
         "report/property_offer_template.xml",
         "report/property_offer_reports.xml",
+        "report/top_property_template.xml",
+        "report/top_property_report.xml",
     ],
     "demo": [
         "demo/property_type_demo.xml",

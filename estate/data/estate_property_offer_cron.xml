@@ -25,4 +25,19 @@
             <field name="nextcall">2025-10-04 02:00:00</field>
     </record>
 
+
+    <record id="property_update_price_old_offers_cron" model="ir.cron">
+            <field name="name">Automatic price increase for offers older than 30 days</field>
+            <field name="model_id" ref="model_estate_property_offer"/>
+            <field name="state">code</field>
+            <field name="code">model.update_price_old_offers()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="priority">8</field>
+            <field name="active">True</field>
+            <field name="nextcall">2025-10-29 02:00:00</field>
+    </record>
+
+
+
 </odoo>

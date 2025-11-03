@@ -19,11 +19,13 @@
                 <field name="expected_price"/>
                 <field name="selling_price"/>
                 <field name="average_offer_price"/>
+                <field name="price_per_sqm" readonly="1"/>
                 <field name="date_availability" optional="hide"/>
                 <field name="sold_date" optional="hide"/>
                 <field name="property_type_id"/>
                 <field name="salesman_id"/>
                 <field name="buyer_id"/>
+                <field name="contact_email"/>
                 <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                 <field name="total_area"/>
                 <field name="best_price"/>
@@ -77,6 +79,7 @@
                             <field name="best_price"/>
                             <field name="selling_price"/>
                             <field name="average_offer_price"/>
+                            <field name="price_per_sqm" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
@@ -104,6 +107,7 @@
                             <group>
                                 <field name="salesman_id"/>
                                 <field name="buyer_id"/>
+                                <field name="contact_email"/>
                                 <field name="company_id"/>
                             </group>
                         </page>
@@ -156,6 +160,10 @@
                 <filter string="Date availability" name="date_availability"
                         domain="['|', ('state', '=', 'new'), ('state', '=', 'offer_received')]"/>
                 <filter name="available" string="Available" domain="[('state', '=', 'new')]"/>
+                <filter name="inexpensive" string="Inexpensive" domain="[('expected_price', '&lt;=', 100000)]"/>
+                <filter name="medium" string="Medium" domain="[('expected_price', '&gt;', 100000),
+                                                               ('expected_price', '&lt;', 500000)]"/>
+                <filter name="expensive" string="Expensive" domain="[('expected_price', '&gt;', 500000)]"/>
                 <group expand="1" string="Group By">
                     <filter string="Postcode" name="postcode"
                             context="{'group_by':'postcode'}"/>
@@ -172,51 +180,52 @@
         <field name="arch" type="xml">
             <kanban default_group_by="property_type_id">
                 <field name="state"/>
+
                 <templates>
                     <t t-name="card">
-                        <div class="oe_kanban_global_click">
-                            <div>
-                                <strong><field name="name"/> <field name="unique_number" widget="badge"/>
-                                </strong>
-                                <br/>
-                                <t t-if="record.state.raw_value == 'sold'">
-                                    <span style="background-color: green; color: white; padding: 2px 4px; border-radius: 4px;">
-                                        Sold</span>
-                                </t>
-                                <t t-if="record.state.raw_value == 'new'">
-                                    <span style="background-color: violet; color: white; padding: 2px 4px; border-radius: 4px;">
-                                        New</span>
-                                </t>
-                                <t t-if="record.state.raw_value == 'offer_received'">
-                                    <span style="background-color: blue; color: white; padding: 2px 4px; border-radius: 4px;">
-                                        Offer Received</span>
-                                </t>
-                                <t t-if="record.state.raw_value == 'offer_accepted'">
-                                    <span style="background-color: yellow; color: black; padding: 2px 4px; border-radius: 4px;">
-                                        Offer Accepted</span>
-                                </t>
-                                <t t-if="record.state.raw_value == 'cancelled'">
-                                    <span style="background-color: red; color: white; padding: 2px 4px; border-radius: 4px;">
-                                        Cancelled</span>
-                                </t>
+                        <div class="oe_kanban_global_click"/>
+                        <div>
+
+                            <strong><field name="name"/> <field name="unique_number" widget="badge"/>
+                            </strong>
+                            <br/>
+                            <t t-if="record.state.raw_value == 'sold'">
+                                <span style="background-color: green; color: white; padding: 2px 4px; border-radius: 4px;">
+                                    Sold</span>
+                            </t>
+                            <t t-if="record.state.raw_value == 'new'">
+                                <span style="background-color: violet; color: white; padding: 2px 4px; border-radius: 4px;">
+                                    New</span>
+                            </t>
+                            <t t-if="record.state.raw_value == 'offer_received'">
+                                <span style="background-color: blue; color: white; padding: 2px 4px; border-radius: 4px;">
+                                    Offer Received</span>
+                            </t>
+                            <t t-if="record.state.raw_value == 'offer_accepted'">
+                                <span style="background-color: yellow; color: black; padding: 2px 4px; border-radius: 4px;">
+                                    Offer Accepted</span>
+                            </t>
+                            <t t-if="record.state.raw_value == 'cancelled'">
+                                <span style="background-color: red; color: white; padding: 2px 4px; border-radius: 4px;">
+                                    Cancelled</span>
+                            </t>
 
 
-                                <br/>
-                                <div class="d-flex align-items-center">
-                                    <field name="is_favourite" widget="boolean_toggle"/>
-                                    <span class="ms-1">Favourite</span>
-                                </div>
-
-                                <t t-if="record.state.raw_value == 'offer_received'">
-                                    <div>Best Price: <field name="best_price"/></div></t>
-
-                                Expected Price: <field name="expected_price"/>
-                                <t t-if="record.state.raw_value == 'offer_accepted'">
-                                    <div>Selling Price: <field name="selling_price"/></div>
-                                </t>
-
-                                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                            <br/>
+                            <div class="d-flex align-items-center">
+                                <field name="is_favourite" widget="boolean_toggle"/>
+                                <span class="ms-1">Favourite</span>
                             </div>
+
+                            <t t-if="record.state.raw_value == 'offer_received'">
+                                <div>Best Price: <field name="best_price"/></div></t>
+
+                            Expected Price: <field name="expected_price"/>
+                            <t t-if="record.state.raw_value == 'offer_accepted'">
+                                <div>Selling Price: <field name="selling_price"/></div>
+                            </t>
+
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                         </div>
                     </t>
                 </templates>

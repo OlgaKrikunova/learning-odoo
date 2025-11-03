@@ -51,6 +51,8 @@ class EstateProperty(models.Model):
 
     buyer_id = fields.Many2one("res.partner", string="Buyer", copy=False)
 
+    contact_email = fields.Char(readonly=True)
+
     tag_ids = fields.Many2many(comodel_name="estate.property.tag", string="Tags")
 
     offer_ids = fields.One2many(comodel_name="estate.property.offer", inverse_name="property_id", string="Offers")
@@ -72,6 +74,8 @@ class EstateProperty(models.Model):
     original_price = fields.Float()
 
     average_offer_price = fields.Float(compute="_compute_average_offer_price", store=True)
+
+    price_per_sqm = fields.Float(compute="_compute_price_per_sqm", store=True)
 
     accept_highest_offer = fields.Boolean(default=False)
     cancel_highest_offer = fields.Boolean(default=False)
@@ -103,6 +107,14 @@ class EstateProperty(models.Model):
         else:
             self.garden_area = 0
             self.garden_orientation = ""
+
+    @api.onchange("buyer_id")
+    def _onchange_buyer_id(self):
+        for record in self:
+            if record.buyer_id:
+                record.contact_email = record.buyer_id.email
+            else:
+                record.contact_email = False
 
     def estate_property_action_sold(self):
         for record in self:
@@ -150,6 +162,14 @@ class EstateProperty(models.Model):
 
             if float_compare(record.selling_price, min_price, precision_digits=precision) < 0:
                 raise ValidationError(_("The selling price cannot be lower than 90% of the expected price."))
+
+    @api.constrains("living_area")
+    def _check_living_area(self):
+        for record in self:
+            if record.living_area < 10:
+                raise ValidationError(
+                    _("The living area must be at least 10 m². Current living area: %s m².", record.living_area)
+                )
 
     @api.ondelete(at_uninstall=False)
     def _unlink_if_state(self):
@@ -199,6 +219,14 @@ class EstateProperty(models.Model):
             else:
                 record.average_offer_price = 0
 
+    @api.depends("expected_price", "total_area")
+    def _compute_price_per_sqm(self):
+        for record in self:
+            if record.total_area:
+                record.price_per_sqm = record.expected_price / record.total_area
+            else:
+                record.price_per_sqm = 0
+
     def action_accept_highest_offer(self):
         for record in self:
             record.accept_highest_offer = True
@@ -210,7 +238,11 @@ class EstateProperty(models.Model):
                 raise UserError(_("There are no offers to accept!"))
 
             best_offer = max(offers, key=lambda offer: offer.price)
+            if not best_offer.partner_id.email:
+                raise UserError(_("The selected buyer does not have an email address."))
+
             record.buyer_id = best_offer.partner_id
+            record.contact_email = best_offer.partner_id.email
             best_offer.status = "accepted"
             (offers - best_offer).write({"status": "refused"})
 
@@ -255,5 +287,23 @@ class EstateProperty(models.Model):
             }
 
             self.env["estate.property.offer"].create(offer_vals)
+
+        return records
+
+    MAX_LIMIT = 5
+
+    @api.model_create_multi
+    def create_limit(self, vals_list):
+        records = super().create(vals_list)
+
+        for record in records:
+            if record.salesman_id:
+                active_count = self.search_count([("salesman_id", "=", record.salesman_id.id), ("state", "=", "new")])
+
+            if active_count > self.MAX_LIMIT:
+                record.message_post(
+                    body=f"⚠️ Attention! The seller's active listing limit ({self.MAX_LIMIT}) has been exceeded. "
+                    f"Currently active: {active_count}."
+                )
 
         return records

@@ -25,7 +25,7 @@ class EstatePropertyOffer(models.Model):
         ],
         default="draft",
     )
-    partner_id = fields.Many2one("res.partner", required=True)
+    partner_id = fields.Many2one("res.partner", required=True, string="Buyer")
     property_id = fields.Many2one("estate.property", required=True, ondelete="cascade")
     property_type_id = fields.Many2one(
         related="property_id.property_type_id", comodel_name="estate.property.type", store=True, readonly=False
@@ -78,6 +78,7 @@ class EstatePropertyOffer(models.Model):
                         "buyer_id": offer.partner_id.id,
                         "selling_price": offer.price,
                         "state": "offer_accepted",
+                        "contact_email": offer.partner_id.email,
                     }
                 )
 
@@ -174,3 +175,19 @@ class EstatePropertyOffer(models.Model):
             "target": "current",
             "domain": [("res_model", "=", "estate.property.offer"), ("res_id", "=", self.id)],
         }
+
+    @api.model
+    def update_price_old_offers(self):
+        date_inspection = fields.datetime.now() - timedelta(days=30)
+        old_offers = self.search(
+            [
+                ("date_create", "<", date_inspection),
+                ("status", "not in", ["accepted", "refused", "expired"]),
+            ]
+        )
+        for offer in old_offers:
+            old_price = offer.price
+            new_price = offer.price * 1.1
+            offer.write({"price": new_price})
+            offer.message_post(body=f"The price of the offer has been updated from {old_price} to {new_price}.")
+        return len(old_offers)

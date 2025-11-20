@@ -39,5 +39,20 @@
     </record>
 
 
+     <record id="property_res_currency_cron" model="ir.cron">
+            <field name="name">Checking the exchange rate update</field>
+            <field name="model_id" ref="base.model_res_currency"/>
+            <field name="state">code</field>
+            <field name="code">model.check_currency_cron()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="priority">8</field>
+            <field name="active">True</field>
+            <field name="nextcall">2025-11-07 02:00:00</field>
+    </record>
+
+
+
+
 
 </odoo>

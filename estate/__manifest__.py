@@ -15,7 +15,6 @@
         "views/estate_property_tag.xml",
         "wizard/estate_property_mass_update_wizard_view.xml",
         "wizard/estate_sold_report_view.xml",
-        "views/estate_menus.xml",
         "views/base.view_users_form.xml",
         "data/property_type_data.xml",
         "data/estate_property_offer_cron.xml",
@@ -23,6 +22,7 @@
         "report/property_offer_reports.xml",
         "report/top_property_template.xml",
         "report/top_property_report.xml",
+        "views/estate_menus.xml",
     ],
     "demo": [
         "demo/property_type_demo.xml",
